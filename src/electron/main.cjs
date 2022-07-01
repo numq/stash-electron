@@ -10,7 +10,13 @@ const {app, BrowserWindow} = require("electron");
             protocol: 'file:',
             slashes: true,
         });
-        const window = new BrowserWindow({width: 500, height: 500, minHeight: 500, minWidth: 500, show: showValue});
+        const window = new BrowserWindow({
+            height: 500,
+            width: 500,
+            minHeight: 500,
+            minWidth: 500,
+            show: showValue
+        });
         await window.loadURL(startUrl);
     }
 
