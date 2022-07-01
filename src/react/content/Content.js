@@ -35,8 +35,18 @@ export const Content = () => {
         const reader = new FileReader();
         reader.onload = () => {
             callback(reader.result);
-        }
+        };
         reader.readAsDataURL(file);
+    };
+
+    const saveAs = async blob => {
+        const a = document.createElement('a');
+        a.download = 'download';
+        a.href = blob;
+        a.onclick = _ => {
+            setTimeout(() => URL.revokeObjectURL(a.href), 30 * 1000);
+        };
+        a.click();
     };
 
     return (<>
@@ -75,7 +85,7 @@ export const Content = () => {
                     event.preventDefault();
                     processImage(event.dataTransfer.files[0], setCurrentImage);
                     setTimeout(() => setIsDragging(false), 500);
-                }}>
+                }} onClick={() => currentImage ? saveAs(currentImage) : null}>
                     {
                         currentImage ? <Image src={currentImage}
                                               style={{
