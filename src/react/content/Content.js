@@ -100,7 +100,7 @@ export const Content = () => {
                             }}>{isDragging ? "DROP HERE" : "DRAG & DROP"}</FormText>
                     }
                 </Card>
-                <Form style={{display: "flex", justifyContent: "center"}}>
+                <Form style={{paddingBottom: "32px", display: "flex", justifyContent: "center"}}>
                     <FormControl type="file" onChange={event => {
                         processImage(event.target.files[0], setCurrentImage)
                     }}/>
