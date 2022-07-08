@@ -1,10 +1,11 @@
-import {Card, Col, Container, Form, FormControl, FormText, Image} from "react-bootstrap";
+import {Card, Container, Form, FormControl, FormText, Image, Stack} from "react-bootstrap";
 import {useContext, useEffect, useState} from "react";
 import {ServiceContext} from "../../index.js";
+import {QrCodeImage} from "../qrcode/QrCodeImage.js";
 
 export const Content = () => {
 
-    const {client} = useContext(ServiceContext);
+    const {uri, client} = useContext(ServiceContext);
     const [currentImage, setCurrentImage] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
 
@@ -41,7 +42,7 @@ export const Content = () => {
 
     const saveAs = async blob => {
         const a = document.createElement('a');
-        a.download = 'download';
+        a.download = "download";
         a.href = blob;
         a.onclick = _ => {
             setTimeout(() => URL.revokeObjectURL(a.href), 30 * 1000);
@@ -53,28 +54,26 @@ export const Content = () => {
         <Container style={{
             height: "100vh",
             width: "100vw",
-            display: "flex",
-            alignItems: "center",
+            display: "block",
+            alignSelf: "center",
             justifyContent: "center"
         }}>
-            <Col style={{
-                paddingB: "4px",
+            <Stack direction={"vertical"} style={{
                 height: currentImage ? "auto" : "50vh",
                 width: currentImage ? "auto" : "50vh",
-                display: "flex",
+                display: "block",
                 alignSelf: "center",
-                justifyContent: "space-between",
-                flexDirection: "column"
+                alignItems: "center"
             }}>
                 <Card style={{
                     display: "flex",
                     margin: "16px",
                     height: "100%",
+                    width: "auto",
                     alignItems: "center",
+                    justifyContent: "center",
                     outlineColor: currentImage ? null : "darkgrey",
-                    outlineStyle: currentImage ? null : "dotted",
-                    backgroundColor: isDragging ? "lightgray" : null,
-                    justifyContent: "center"
+                    outlineStyle: currentImage ? null : "dotted"
                 }} onDragOver={event => {
                     event.preventDefault();
                     setIsDragging(true);
@@ -89,8 +88,8 @@ export const Content = () => {
                     {
                         currentImage ? <Image src={currentImage}
                                               style={{
-                                                  height: "90vh",
-                                                  maxWidth: "auto",
+                                                  maxHeight: "50vh",
+                                                  maxWidth: "100%",
                                                   pointerEvents: "none"
                                               }}/> :
                             <FormText style={{
@@ -100,12 +99,16 @@ export const Content = () => {
                             }}>{isDragging ? "DROP HERE" : "DRAG & DROP"}</FormText>
                     }
                 </Card>
-                <Form style={{paddingBottom: "32px", display: "flex", justifyContent: "center"}}>
-                    <FormControl type="file" onChange={event => {
-                        processImage(event.target.files[0], setCurrentImage)
-                    }}/>
-                </Form>
-            </Col>
+                <Stack direction="horizontal" style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                    <Form style={{paddingBottom: "32px", display: "flex", justifyContent: "center"}}>
+                        <FormControl type="file" onChange={event => {
+                            processImage(event.target.files[0], setCurrentImage)
+                        }}/>
+                    </Form>
+                    <QrCodeImage data={`http://${uri}:${window.location.port}`}/>
+                    <FormText style={{width: "100%"}}>Scan to open</FormText>
+                </Stack>
+            </Stack>
         </Container>
     </>)
 };
