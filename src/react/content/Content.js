@@ -1,18 +1,22 @@
-import {Card, Container, Form, FormControl, FormText, Image, Stack} from "react-bootstrap";
 import {useContext, useEffect, useState} from "react";
 import {ServiceContext} from "../../index.js";
 import {QrCodeImage} from "../qrcode/QrCodeImage.js";
+import {Carousel, Form, Image, Stack} from "react-bootstrap";
 
 export const Content = () => {
 
     const {uri, client} = useContext(ServiceContext);
-    const [currentImage, setCurrentImage] = useState(null);
-    const [isDragging, setIsDragging] = useState(false);
+    const [images, setImages] = useState([]);
+
+    const sendImage = image => {
+        client.signal('image', {image: image});
+        setImages(prevState => prevState.includes(image) ? prevState : [...prevState, image]);
+    };
 
     const onClientMessage = (type, body) => {
         switch (type) {
             case "image": {
-                setCurrentImage(body.image);
+                sendImage(body.image);
                 break;
             }
             default: {
@@ -26,18 +30,21 @@ export const Content = () => {
         return () => {
             client?.close();
         }
-    }, [client]);
+    }, []);
 
-    useEffect(() => {
-        client.signal("image", {image: currentImage});
-    }, [client, currentImage]);
-
-    const processImage = (file, callback) => {
+    const processImage = (image, callback) => {
         const reader = new FileReader();
         reader.onload = () => {
             callback(reader.result);
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(image);
+    };
+
+    const processFiles = files => {
+        const types = ['image/jpeg', 'image/jpg', 'image/png'];
+        [...files].filter(f => types.includes(f.type)).forEach(file => {
+            processImage(file, sendImage);
+        });
     };
 
     const saveAs = async blob => {
@@ -50,65 +57,50 @@ export const Content = () => {
         a.click();
     };
 
-    return (<>
-        <Container style={{
-            height: "100vh",
-            width: "100vw",
-            display: "block",
-            alignSelf: "center",
-            justifyContent: "center"
-        }}>
-            <Stack direction={"vertical"} style={{
-                height: currentImage ? "auto" : "50vh",
-                width: currentImage ? "auto" : "50vh",
-                display: "block",
-                alignSelf: "center",
-                alignItems: "center"
-            }}>
-                <Card style={{
-                    display: "flex",
-                    margin: "16px",
-                    height: "100%",
-                    width: "auto",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    outlineColor: currentImage ? null : "darkgrey",
-                    outlineStyle: currentImage ? null : "dotted"
-                }} onDragOver={event => {
-                    event.preventDefault();
-                    setIsDragging(true);
-                }} onDragLeave={event => {
-                    event.preventDefault();
-                    setIsDragging(false);
-                }} onDrop={event => {
-                    event.preventDefault();
-                    processImage(event.dataTransfer.files[0], setCurrentImage);
-                    setTimeout(() => setIsDragging(false), 500);
-                }} onClick={() => currentImage ? saveAs(currentImage) : null}>
-                    {
-                        currentImage ? <Image src={currentImage}
-                                              style={{
-                                                  maxHeight: "50vh",
-                                                  maxWidth: "100%",
-                                                  pointerEvents: "none"
-                                              }}/> :
-                            <FormText style={{
-                                fontSize: "50px",
-                                textAlign: "center",
-                                pointerEvents: "none"
-                            }}>{isDragging ? "DROP HERE" : "DRAG & DROP"}</FormText>
-                    }
-                </Card>
-                <Stack direction="horizontal" style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-                    <Form style={{paddingBottom: "32px", display: "flex", justifyContent: "center"}}>
-                        <FormControl type="file" onChange={event => {
-                            processImage(event.target.files[0], setCurrentImage)
-                        }}/>
-                    </Form>
-                    <QrCodeImage data={`http://${uri}:${window.location.port}`}/>
-                    <FormText style={{width: "100%"}}>Scan to open</FormText>
-                </Stack>
+    return (
+        <Stack direction={"vertical"}
+               style={{
+                   padding: "32px",
+                   height: "100%",
+                   display: "flex",
+                   alignContent: "start",
+                   justifyContent: "center"
+               }}>
+            <Stack direction={"horizontal"}
+                   style={{
+                       display: "flex",
+                       alignItems: "center",
+                       justifyContent: "center",
+                       maxHeight: "25vh"
+                   }}>
+                <Form style={{height: "auto", width: "50%", padding: "16px"}}>
+                    <Form.Control type="file" multiple label="Select files or drag them here" onChange={
+                        event => processFiles(event.target.files)
+                    } onDragOver={event => {
+                        event.preventDefault();
+                    }} onDragLeave={event => {
+                        event.preventDefault();
+                    }} onDrop={event => {
+                        event.preventDefault();
+                        processFiles(event.dataTransfer.files);
+                    }}/>
+                </Form>
+                <QrCodeImage data={`http://${uri}:${window.location.port}`}/>
             </Stack>
-        </Container>
-    </>)
+            {
+                images.length > 0 ?
+                    <Carousel style={{alignSelf: "center"}}
+                              controls={images.length > 1}>{
+                        Array.from(images).map((image, idx) =>
+                            <Carousel.Item>
+                                <Image src={image} key={idx} onClick={() => saveAs(image)}
+                                       style={{height: "75vh"}}/>
+                            </Carousel.Item>
+                        )
+                    }
+                    </Carousel>
+                    : null
+            }
+        </Stack>
+    )
 };

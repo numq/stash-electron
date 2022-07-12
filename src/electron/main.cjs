@@ -1,4 +1,6 @@
+const isDev = require("electron-is-dev");
 const url = require("url");
+const path = require("path");
 const {app, BrowserWindow} = require("electron");
 
 (() => {
@@ -9,17 +11,16 @@ const {app, BrowserWindow} = require("electron");
             width: 500,
             minHeight: 500,
             minWidth: 500,
-            show: false
+            show: true
         });
         const startUrl = process.env.ELECTRON_START_URL || url.format({
             pathname: `file://${__dirname}/../build/index.html`,
             protocol: 'file:',
             slashes: true,
         });
-        await window.loadURL(startUrl);
-        window.on('ready-to-show', window.show);
+        isDev ? await window.loadURL(startUrl) : await window.loadFile(path.join("build", "index.html"));
     }
-    setTimeout(() => app.whenReady().then(createWindow), 4000);
+    setTimeout(() => app.whenReady().then(createWindow), 8000);
     app.on('window-all-closed', () => {
         if (process.platform !== 'darwin') app.quit();
     });

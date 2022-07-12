@@ -1,6 +1,6 @@
 import {toDataURL} from "qrcode";
 import {useEffect, useRef} from "react";
-import {Image} from "react-bootstrap";
+import {Figure} from "react-bootstrap";
 
 export const QrCodeImage = ({data}) => {
 
@@ -12,5 +12,12 @@ export const QrCodeImage = ({data}) => {
         }).catch(console.error);
     }, [data]);
 
-    return (<Image ref={image}/>)
+    return (
+        <Figure style={{width: "auto", display: "grid", pointerEvents: "none"}}>
+            <Figure.Image ref={image}/>
+            <Figure.Caption>
+                <p className={"text-center"}>Scan to get URL</p>
+            </Figure.Caption>
+        </Figure>
+    )
 };
