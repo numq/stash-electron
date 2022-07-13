@@ -1,5 +1,5 @@
 # Stash
-A client-server application that allows you to transfer an image between a PC and any device that can connect to the local host.
+A client-server application that allows you to share and download images between devices in your local network.
 
 ![Architecture diagram](./media/stash_electron_scheme.png)
 
