@@ -13,7 +13,7 @@ export const QrCodeImage = ({data}) => {
     }, [data]);
 
     return (
-        <Figure style={{width: "auto", display: "grid", pointerEvents: "none"}}>
+        <Figure style={{display: "grid", pointerEvents: "none"}}>
             <Figure.Image ref={image}/>
             <Figure.Caption>
                 <p className={"text-center"}>Scan to get URL</p>
