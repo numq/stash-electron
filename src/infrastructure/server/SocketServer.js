@@ -19,7 +19,8 @@ export const SocketServer = port => (() => {
             console.error(`An error occurred:\n${err}`);
         });
         webSocketServer.addListener("connection", socket => {
-            console.log("Client connected.");
+            socket.onopen = _ => console.log("Client connected.");
+            socket.onclose = _ => console.log("Client disconnected.");
             socket.onmessage = ({data}) => broadcast(webSocketServer, data);
         });
         httpServer.listen(port);

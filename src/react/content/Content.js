@@ -32,6 +32,9 @@ export const Content = () => {
 
     useEffect(() => {
         setTimeout(() => client.signal('refresh', {}), 2 * 1000);
+        return () => {
+            client.close();
+        }
     }, [client]);
 
     useEffect(() => {
