@@ -15,6 +15,9 @@ npm run dev
 ## Tech:
 - JavaScript
 - React
-- React-Bootstrap
+- Bootstrap
 - Electron
 - WebSockets
+- JSZip
+- QRCode
+- FileSaver
