@@ -1,5 +1,9 @@
 # Stash
-A client-server application that allows you to share and download images between devices in your local network.
+Web/Desktop application with a built-in echo server that allows you to share files between clients on your local network.
+
+**Also check:**
+
+[Android Compose image sharing client](https://github.com/numq/Stash)
 
 ![Architecture diagram](./media/stash_electron_scheme.png)
 
@@ -11,6 +15,9 @@ npm run dev
 ## Tech:
 - JavaScript
 - React
-- React-Bootstrap
+- Bootstrap
 - Electron
 - WebSockets
+- JSZip
+- QRCode
+- FileSaver
